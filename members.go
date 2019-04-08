@@ -16,6 +16,11 @@ const (
 	single_member_note_path = member_notes_path + "/%s"
 )
 
+type MemberTag struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
+
 type ListOfMembers struct {
 	baseList
 
@@ -32,6 +37,7 @@ type MemberRequest struct {
 	Language     string                 `json:"language"`
 	VIP          bool                   `json:"vip"`
 	Location     *MemberLocation        `json:"location,omitempty"`
+	Tags         []string               `json:"tags,omitempty"`
 }
 
 type Member struct {
@@ -49,6 +55,7 @@ type Member struct {
 	LastChanged     string          `json:"last_changed"`
 	EmailClient     string          `json:"email_client"`
 	LastNote        MemberNoteShort `json:"last_note"`
+	Tags            []MemberTag     `json:"tags"`
 
 	api *API
 }
