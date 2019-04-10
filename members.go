@@ -14,12 +14,12 @@ const (
 
 	member_notes_path       = single_member_path + "/notes"
 	single_member_note_path = member_notes_path + "/%s"
-)
 
-type MemberTag struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
-}
+	member_tags_path = single_member_path + "/tags"
+
+	TAG_STATUS_ACTIVE   = "active"
+	TAG_STATUS_INACTIVE = "inactive"
+)
 
 type ListOfMembers struct {
 	baseList
@@ -316,4 +316,48 @@ func (mem Member) DeleteNote(id string) (bool, error) {
 
 	endpoint := fmt.Sprintf(single_member_note_path, mem.ListID, mem.ID, id)
 	return mem.api.RequestOk("DELETE", endpoint)
+}
+
+// ------------------------------------------------------------------------------------------------
+// TAGS
+// ------------------------------------------------------------------------------------------------
+
+type MemberTag struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
+
+type MemberTagRequest struct {
+	Name   string `json:"name"`
+	Status string `json:"status"`
+}
+
+type MemberPostTagsRequest struct {
+	Tags []MemberTagRequest `json:"tags"`
+}
+
+type ListOfMemberTags struct {
+	baseList
+	Tags []MemberTag `json:"tags"`
+}
+
+func (mem Member) GetTags(params QueryParams) (*ListOfMemberTags, error) {
+	if err := mem.CanMakeRequest(); err != nil {
+		return nil, err
+	}
+
+	endpoint := fmt.Sprintf(member_tags_path, mem.ListID, mem.ID)
+	response := new(ListOfMemberTags)
+
+	return response, mem.api.Request("GET", endpoint, params, nil, response)
+}
+
+func (mem Member) PostTags(req *MemberPostTagsRequest) error {
+	if err := mem.CanMakeRequest(); err != nil {
+		return err
+	}
+
+	endpoint := fmt.Sprintf(member_tags_path, mem.ListID, mem.ID)
+
+	return mem.api.Request("POST", endpoint, nil, req, nil)
 }
